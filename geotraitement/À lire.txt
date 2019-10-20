@@ -1,0 +1,2 @@
+Pour faire fonctionner le code, utiliser un proxy, voir : https://github.com/Esri/resource-proxy
+De mon côté j'utilise Uwamp pour les démos. 
