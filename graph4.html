@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Introduction à l'API Esri</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.12/"></script>
+    <style>
+        html,
+        body,
+        #maCarte {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        var map;
+
+        require(["esri/Map", "esri/views/MapView", "esri/Graphic",  "dojo/domReady!"], function (Map, MapView, Graphic) {
+
+            let graphic = new Graphic({
+                attributes:{
+                    id:1,
+                    ville:"Québec",
+                    population:600000
+                },
+                geometry: {
+                    type:"point",
+                    x:-71.23, 
+                    y:46.83
+                },
+                symbol:{
+                    type: "simple-marker",
+                    style: "circle",
+                    color: "green",
+                    size:10,
+                    outline:{
+                        color:"rgba(0,0,0,0.5)",
+                        width: 2
+                    }
+                },
+                popupTemplate:{
+                    title:"Ville de {ville}",
+                    content:"Population {population} habs <br> x:{x}"
+                }
+            });
+
+            var map = new Map({
+                basemap: "gray"
+       
+            });
+
+            var view = new MapView({
+                container: "maCarte",
+                center: [-71.23, 46.83],
+                zoom: 8,
+                map: map
+            });
+
+            view.graphics.add(graphic);            
+
+        });
+
+      </script>
+    <div id="maCarte"></div>
+
+</body>
+
+</html>

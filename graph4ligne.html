@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Introduction l'AMD</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.12/"></script>
+    <style>
+        html,
+        body,
+        #maCarte {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        var map;
+
+        require(["esri/Map", "esri/views/MapView", "esri/Graphic",  "dojo/domReady!"], function (Map, MapView, Graphic) {
+
+            let graphic = new Graphic({
+                attributes:{
+                    id:1,
+                    nom:"Québec-Paris",
+                    description:"Vol Québec-Paris"
+                },
+                geometry: {
+                    type:"polyline",
+                    paths: [[-71.23,46.83],[2.339507,48.859950]]
+                },
+                symbol:{
+                    type: "simple-line",
+                    color: "blue",
+                    width: 2,
+                    style: "short-dash-dot"
+                    },
+                popupTemplate:{
+                    title:"{nom}",
+                    content:"{description}"
+                }
+            });
+
+            var map = new Map({
+                basemap: "gray"
+       
+            });
+
+            var view = new MapView({
+                container: "maCarte",
+                center: [-20, 46.83],
+                zoom: 3,
+                map: map
+            });
+
+            view.graphics.add(graphic);            
+
+        });
+
+      </script>
+    <div id="maCarte"></div>
+
+</body>
+
+</html>

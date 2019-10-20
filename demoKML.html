@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Introduction à l'API Esri</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.29/esri/css/esri.css">
+    <script src="https://js.arcgis.com/3.29/"></script>
+    <style>
+        html,
+        body,
+        #maCarte {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        var map;
+
+        require(["esri/map",, "esri/config", "dojo/domReady!"], function (Map, KMLLayer, esriConfig) {
+
+                //CORS
+                //esriConfig.defaults.io.corsEnabledServers.push("continentcot.ca");
+
+                map = new Map("maCarte",
+                    {
+                        basemap: "topo",
+                        center: [-71, 46],
+                        zoom: 8
+                    });
+             
+             var kmlUrl = "https://continentcot.ca/cours/multimedia2/arrondissements.kml";
+             var kml = new KMLLayer(kmlUrl);
+             map.addLayer(kml);
+                
+                
+
+            });
+
+
+    </script>
+    <div id="maCarte"></div>
+
+</body>
+
+</html>

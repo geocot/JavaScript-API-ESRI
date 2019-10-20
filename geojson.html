@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Introduction à l'API Esri</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.12/"></script>
+    <style>
+        html,
+        body,
+        #maCarte {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        var map;
+
+        require(["esri/Map", "esri/views/MapView", , "dojo/domReady!"], function (Map, MapView) {
+
+            var map = new Map({
+                basemap: "gray"
+       
+            });
+
+            var view = new MapView({
+                container: "maCarte",
+                center: [-71, 46],
+                zoom: 8,
+                map: map
+            });
+
+
+        });
+
+  /*
+            var villes = {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                -71.200521, 46.817650
+                            ]
+                        },
+                        "type": "Feature",
+                        "properties": {
+                            "popupContent": "Québec"
+                        },
+                        "id": 1
+                    }, {
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                153.026355, -27.446153
+                            ]
+                        },
+                        "type": "Feature",
+                        "properties": {
+                            "popupContent": "Brisbane"
+                        },
+                        "id": 2
+                    }
+                ]
+            };*/
+
+
+
+
+
+
+    </script>
+    <div id="maCarte"></div>
+
+</body>
+
+</html>

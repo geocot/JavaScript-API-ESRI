@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Introduction à l'API Esri</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.29/esri/css/esri.css">
+    <script src="https://js.arcgis.com/3.29/"></script>
+    <style>
+        html,
+        body,
+        #maCarte {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        var map;
+
+        require(["esri/map","esri/layers/GeoRSSLayer", "esri/config", "dojo/domReady!"], function (Map, GeoRSSLayer , esriConfig) {
+
+                //CORS
+                //esriConfig.defaults.io.corsEnabledServers.push("continentcot.ca");
+
+                map = new Map("maCarte",
+                    {
+                        basemap: "topo",
+                        center: [-71, 46],
+                        zoom: 8
+                    });
+             
+             var geoRSSUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.atom";
+             coucheGeoRSS = new GeoRSSLayer(geoRSSUrl);
+             map.addLayer(coucheGeoRSS);
+                
+                
+
+            });
+
+
+    </script>
+    <div id="maCarte"></div>
+
+</body>
+
+</html>
