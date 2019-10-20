@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Introduction à l'API Esri</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css"/>
+    <script src="https://js.arcgis.com/4.12/"></script>
+
+    <style>
+        html, body,#maCarte{
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+    var map;
+
+    require(["esri/Map", "esri/widgets/Legend", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/widgets/ScaleBar","esri/widgets/Print", "dojo/domReady!"], function(Map,Legend,  MapView, FeatureLayer, ScaleBar, Print){
+        const map = new Map({
+          basemap: "gray"
+        });
+
+        const view = new MapView({
+          container: "maCarte",
+          center: [-100.2,40.8],
+          zoom: 5,
+          map: map
+        });
+       
+       
+       
+       
+       const  sb = new ScaleBar({  
+           view: view,
+           unit:"dual"
+        });
+
+        view.ui.add(sb, {
+            position: "bottom-left"
+            });
+
+        const fl = new FeatureLayer({
+            url:"https://sampleserver5.arcgisonline.com/arcgis/rest/services/SampleWorldCities/MapServer/0"/*,
+            outFields:["STATE_NAME", "POP2000", "POP2007"],
+            popupTemplate:{
+                title: "État: {STATE_NAME}",
+                content:[
+                    {type:"text",
+                    text:"Pop 2000: {POP2000}<br>Pop 2007: {POP2007}"
+                    }, {
+                        type:"media",
+                        mediaInfos:[
+                            {
+                                title:"Population",
+                                type:"column-chart",
+                                value:{
+                                    theme:"blue",
+                                    fields:["POP2000", "POP2007"]
+                                }
+                            }
+                        ]
+                    }
+                    ]
+            }*/
+        });
+
+        var legend = new Legend({
+            view: view,
+            layerInfos: [{
+                layer: fl,
+                title: "Légende"
+            }]
+        });
+
+        view.ui.add(legend, "bottom-right");
+
+        map.add(fl);
+
+    });
+    
+    
+    </script>
+    <div id="maCarte"></div>
+
+</body>
+</html>

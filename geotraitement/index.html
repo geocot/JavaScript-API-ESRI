@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Géotraitements</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.13/esri/themes/light/main.css"/>
+    <script src="https://js.arcgis.com/4.13/"></script>
+
+    <style>
+        html, body,#maCarte{
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #outils {
+            background-color:rgb(13, 50, 119);
+            color: white;
+            padding: 10px;
+            font-size:20px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+    var map;
+
+    require([
+        "esri/Map",  
+        "esri/views/MapView",
+        "esri/tasks/Geoprocessor",
+        "esri/layers/GraphicsLayer", 
+        "esri/Graphic",
+        "esri/tasks/support/FeatureSet",
+        "esri/geometry/Circle",
+        "esri/config",
+        "esri/core/urlUtils",
+        "dojo/domReady!"
+        ], function(Map,
+        MapView,
+        Geoprocessor,
+        GraphicsLayer,
+        Graphic,
+        FeatureSet,
+        Circle,
+        esriConfig, 
+        urlUtils){
+       
+        urlUtils.addProxyRule({
+        urlPrefix: "sampleserver1.arcgisonline.com",
+        proxyUrl: "http://localhost/PHP/proxy.php"
+        });
+        const elementRayon = document.getElementById("inputRayon");
+        const elementResultat = document.getElementById("resultat");
+
+        const map = new Map({
+          basemap: "gray"
+        });
+
+        const view = new MapView({
+          container: "maCarte",
+          center: [-71.2,46.8],
+          zoom: 12,
+          map: map
+        });
+
+        //Au chargement de la vue.
+        view.when(function(){
+          view.ui.add("outils", "top-right");
+        });
+
+        const gpURL = "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/GPServer/PopulationSummary";
+
+        var coucheGraphique = new GraphicsLayer();
+        map.add(coucheGraphique);
+
+        var fillSymbol = {
+          type: "simple-fill",
+          color:[13, 50, 119, 0.5],
+          outline:{
+            color:[100,100,100],
+            widht:1
+          }
+        };
+
+       const gp = new Geoprocessor(gpURL);
+        view.on("click", calcPopulation);
+
+    //Évènement du click
+        function calcPopulation(event) {
+          coucheGraphique.removeAll(); //Efface tout
+          elementResultat.innerHTML = "En traitement...";
+          
+          var cercle = new Circle({
+              center: event.mapPoint,
+              radius: elementRayon.value,
+              radiusUnit:"kilometers"
+          });
+
+          var cercleGraph = new Graphic({
+            geometry: cercle,
+            symbol: fillSymbol
+          })
+
+          coucheGraphique.add(cercleGraph);
+
+          var featureSet = FeatureSet();
+          featureSet.features = cercleGraph;
+
+          var parametres = {
+            inputPoly: featureSet
+          };
+
+          gp.execute(parametres).then(traiteResultats);
+        };
+
+      function traiteResultats(result){
+        elementResultat.innerHTML = "Population: " + result.results[0].value.features[0].attributes.SUM + " Hab.";
+      };
+    });//Require
+    
+
+    
+    </script>
+    <div id="maCarte">
+      <div class="esri-widget" id="outils">
+        <p>Entrer le rayon du cercle</p>
+        <input type="number" id="inputRayon" min="1" max="20" value="5"/>
+        <p  id="resultat" ></p>
+      </div>   
+    </div>
+
+</body>
+</html>

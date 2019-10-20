@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Introduction à l'API Esri (Cours CartoWeb Cégep Limoilou)</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css"/>
+    <script src="https://js.arcgis.com/4.12/"></script>
+
+    <style>
+        html, body,#maCarte{
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #optionsDiv {
+            background-color:rgb(191, 047, 056);
+            color: white;
+            padding: 10px;
+
+        }
+        #afficheHeure {
+            background-color:rgb(191, 047, 056);
+            color: white;
+            padding: 10px;
+            font-size:40px;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+    var map;
+    var dateJour = new Date();
+
+    require(["esri/Map",  "esri/layers/SceneLayer","esri/views/SceneView", "dojo/domReady!"], function(Map, SceneLayer, SceneView){
+
+        const maScene = new SceneLayer({
+            url: "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Building_Montreal/SceneServer/layers/0"
+        });
+
+        const map = new Map({
+          basemap: "hybrid",
+          ground:"world-elevation"
+          });
+
+         const view = new SceneView({
+          container: "maCarte",
+
+          camera: { // Caméra
+            position: { //Position de la caméra
+              x: -73.577210,
+              y: 45.495937,
+              z: 400,
+              spatialReference: { // référence spatiale du point
+                wkid: 4326
+              }
+            },
+            heading: 58.85,
+            tilt: 70,
+            fov: 100
+          }, environment: {
+            atmosphere: { //  Atmosphère de haute qualité
+              quality: "high"
+            },
+            lighting: {
+              date: dateJour, //Date maintenant
+              directShadowsEnabled: true,
+              cameraTrackingEnabled: false
+            }
+          },
+          map: map
+        });
+       
+        var iHeure = document.getElementById("inputHeure")
+        var aHeure = document.getElementById("afficheHeure")
+
+        function changeHeure(){
+          view.environment.lighting.date = dateJour.setHours(iHeure.value);
+          aHeure.innerHTML=iHeure.value + "h";
+        }
+
+       view.when(function(){
+            view.ui.add("optionsDiv", "top-right");
+            view.ui.add("afficheHeure", "bottom-right");
+            iHeure.addEventListener("change", changeHeure);
+            aHeure.innerHTML=iHeure.value + "h";
+        });
+
+
+
+       map.add(maScene);
+    });
+    
+    
+    </script>
+    <div id="maCarte">
+        <div class="esri-widget" id="optionsDiv">
+          <h2>Heure du jour</h2>
+          <input type="number" id="inputHeure" min="0" max="23" value="12"/>
+        </div>
+        <div class="esri-widget" id="afficheHeure"></div>
+      </div>
+
+</body>
+</html>

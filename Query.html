@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Query</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css"/>
+    <script src="https://js.arcgis.com/4.12/"></script>
+
+    <style>
+        html, body,#maCarte{
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #optionsDiv {
+            background-color: orangered;
+            color: white;
+            padding: 10px;
+            width: 350px;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+    var map;
+
+    require(["esri/Map",  "esri/views/MapView", "esri/layers/FeatureLayer","esri/tasks/QueryTask", "esri/tasks/support/Query", "esri/layers/GraphicsLayer","dojo/domReady!"], 
+            function(Map, MapView, FeatureLayer, QueryTask, Query, GraphicsLayer){
+        const map = new Map({
+          basemap: "gray"
+        });
+
+        const view = new MapView({
+          container: "maCarte",
+          center: [-71.2,46.8],
+          zoom: 5,
+          map: map
+        });
+    const inputPop = document.getElementById("popIn");
+    const villesURL = "https://sampleserver5.arcgisonline.com/arcgis/rest/services/SampleWorldCities/MapServer/0";
+    const graphicResponse = new GraphicsLayer();
+    const coucheVilles = new FeatureLayer({
+        url:villesURL
+    });
+
+    const qt =  new QueryTask({
+        url:villesURL
+    });
+
+    var params = new Query({
+        returnGeometry: true,
+        outFields: ["*"]
+    });
+
+    view.when(function(){
+       view.ui.add("optionsDiv", "top-right"); 
+       document.getElementById("doBTN").addEventListener("click", faitRequete);
+    });
+
+    function faitRequete(){
+        graphicResponse.removeAll();
+        params.where = "POP > " + inputPop.value;
+        qt
+            .execute(params)
+            .then(traitementResultat)
+            .catch(problemeRequete);
+    }
+
+    
+
+    function traitementResultat(response){
+         var retourVilles = response.features.map(function(feature){
+            feature.symbol = {
+                type: "simple-marker",
+                style: "circle",
+                color: "orange",
+                size: feature.attributes.POP / 500000,
+                outline:{
+                    width: 2,
+                    color:"green"
+                }
+                };
+                return feature;
+            });
+        graphicResponse.addMany(retourVilles);
+        
+    }
+
+    function problemeRequete(error){
+        console.log("Probleme " + error.message);
+    }
+
+    map.add(graphicResponse);
+    //map.add(coucheVilles);
+
+    });//Require
+    </script>
+    <div id="maCarte">
+        <div class="esri-widget" id="optionsDiv">
+            <p>Entrer le nomnbre de population minimum à rechercher</p>
+            <input type="number" id="popIn" value="1000000"/>
+            <button class="esri-widget" id="doBTN">Lancer la requête</button>
+        </div>
+    </div>
+
+</body>
+</html>

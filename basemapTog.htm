@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Introduction à l'API Esri</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css"/>
+    <script src="https://js.arcgis.com/4.12/"></script>
+
+    <style>
+        html, body,#maCarte{
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+    var map;
+
+    require(["esri/Map",  "esri/views/MapView","esri/widgets/BasemapToggle", "esri/widgets/BasemapGallery", "dojo/domReady!"], function(Map, MapView, BasemapToggle, BasemapGallery){
+        const map = new Map({
+          basemap: "hybrid"
+        });
+
+        const view = new MapView({
+          container: "maCarte",
+          center: [-71.2,46.8],
+          zoom: 5,
+          map: map
+        });
+
+        /*var bToggle = new BasemapToggle({
+            view: view,
+            nextBasemap:"topo"
+        });*/
+       
+        var basemapGallery = new BasemapGallery({
+                view: view
+        });
+
+       view.ui.add(basemapGallery, "bottom-right");
+    });
+    
+    
+    </script>
+    <div id="maCarte"></div>
+
+</body>
+</html>

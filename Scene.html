@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Introduction à l'API Esri</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css"/>
+    <script src="https://js.arcgis.com/4.12/"></script>
+
+    <style>
+        html, body,#maCarte{
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+    var map;
+
+    require(["esri/Map",  "esri/views/SceneView", "esri/layers/SceneLayer", "dojo/domReady!"], function(Map, SceneView, SceneLayer){
+        const map = new Map({
+          basemap: "streets"
+        });
+
+        const view = new SceneView({
+          container: "maCarte",
+          center: [-71.2,46.8],
+          zoom: 18,
+            camera:{
+                position:{
+                    x:-73.574113,
+                    y:45.488862,
+                    z:300
+                },
+                heading:40,
+                tilt:80
+            },environment: {
+            atmosphere: { // creates a realistic view of the atmosphere
+              quality: "high"
+            },
+            lighting: {
+              date: new Date(),
+              directShadowsEnabled: true,
+              // don't update the view time when user pans.
+              // The clock widget drives the time
+              cameraTrackingEnabled: false
+            }
+          },
+
+          map: map
+        });
+       
+       const maScene = new SceneLayer({
+        url: "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Building_Montreal/SceneServer/layers/0"
+       });
+       
+       map.add(maScene);
+
+    });
+    
+    
+    </script>
+    <div id="maCarte"></div>
+
+</body>
+</html>

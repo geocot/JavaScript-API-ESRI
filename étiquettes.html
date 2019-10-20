@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Étiquettes</title>
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.13/esri/themes/dark/main.css"
+    />
+    <script src="https://js.arcgis.com/4.13/"></script>
+
+    <style>
+        html, body,#maCarte{
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+    var map;
+
+    require(["esri/Map",  "esri/views/MapView", "esri/layers/FeatureLayer","esri/layers/support/LabelClass","dojo/domReady!"],
+     function(Map, MapView,FeatureLayer,LabelClass){
+        const map = new Map({
+          basemap: "gray"
+        });
+        const etiquetteFL = new LabelClass ({
+            labelExpressionInfo: { expression: "$feature.Essence_Français" },
+            symbol: {
+                type: "text",  // autocasts as new TextSymbol()
+                color: "green",
+                haloSize: 1,
+                haloColor: "white",
+                font:{
+                    family:"arial",
+                    size:12,
+                    weight:"bold"
+                }
+            },
+            labelPlacement:"above-center"
+        });
+
+        const fl = new FeatureLayer({
+            url:"https://services.arcgis.com/3MrgBYsx9oKZpmLl/ArcGIS/rest/services/arbrespublics_Parc/FeatureServer/0", 
+            labelingInfo: [etiquetteFL],
+            definitionExpression: "Diametre < 10"
+        });
+        
+
+        const view = new MapView({
+          container: "maCarte",
+          center: [ -73.567286,45.526860], 
+          zoom:17, //Montréal
+          map: map
+        });
+
+        map.add(fl);
+
+
+
+      });  //Require
+
+    
+    
+    </script>
+    <div id="maCarte"></div>
+
+</body>
+</html>

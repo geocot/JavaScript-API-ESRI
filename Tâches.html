@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Les tâches</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css"/>
+    <script src="https://js.arcgis.com/4.12/"></script>
+
+    <style>
+        html, body,#maCarte{
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #optionsDiv {
+            background-color: dimgray;
+            color: white;
+            padding: 10px;
+            width: 350px;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+    var map;
+
+    require(["esri/Map",  "esri/views/MapView","esri/layers/FeatureLayer","esri/tasks/support/Query", "esri/tasks/QueryTask","esri/layers/GraphicsLayer", "dojo/domReady!"], 
+                        function(Map, MapView, FeatureLayer,Query,QueryTask,GraphicsLayer){
+        
+        
+        var graphSymbol = {
+          type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+          style: "circle",
+          size: 15,
+          outline: {
+            // autocasts as new SimpleLineSymbol()
+            width: 4
+          }
+        };        
+
+    //Couche de résultats
+       var resultsLayer = new GraphicsLayer();
+        
+        const map = new Map({
+          basemap: "gray",
+          layers: [resultsLayer]
+        });
+
+        const view = new MapView({
+          container: "maCarte",
+          center: [-71.2,46.8],
+          zoom: 5,
+          map: map
+        });
+       
+       const villesURL = "https://sampleserver5.arcgisonline.com/arcgis/rest/services/SampleWorldCities/MapServer/0";
+
+       const fl = new FeatureLayer({
+           url:villesURL
+       })
+    
+
+
+       //Query Task
+       var qTask = new QueryTask({
+          url: villesURL
+        });
+
+       //Paramètres du Query
+       var params = new Query({
+          returnGeometry: true,
+          outFields: ["*"]
+        });
+
+        view.when(function() {
+          view.ui.add("optionsDiv", "top-right");
+          document.getElementById("doBtn").addEventListener("click", doQuery);
+        });
+
+        const valeurPopulation = document.getElementById("popIn");
+
+        function doQuery() {
+          // Clear the results from a previous query
+          resultsLayer.removeAll();
+          params.where =
+            "POP > " + valeurPopulation.value;
+ 
+          // executes the query and calls getResults() once the promise is resolved
+          // promiseRejected() is called if the promise is rejected
+          qTask
+            .execute(params)
+            .then(getResults)
+            .catch(promiseRejected);
+        }
+
+        function getResults(response) {
+            console.log("OK");
+            var peakResults = response.features.map(function(feature) {
+            // Sets the symbol of each resulting feature to a cone with a
+            // fixed color and width. The height is based on the mountain's elevation
+            feature.symbol = graphSymbol;
+            });
+
+            resultsLayer.addMany(peakResults);
+        
+        }
+            
+
+        function promiseRejected(error) {
+            console.log("Promise rejected: ", error.message);
+        
+        }
+
+       map.add(fl);
+    
+    });//Fin Require
+    
+    
+    </script>
+    <div id="maCarte">
+        <div class="esri-widget" id="optionsDiv">
+                <p>Entrer le nombre de population minimum à rechercher</p>
+                <input type="number" id="popIn" value="1000000"/>
+                <button class="esri-widget" id="doBtn">Lancer la recherche</button>
+
+        </div>
+    </div>
+
+</body>
+</html>
