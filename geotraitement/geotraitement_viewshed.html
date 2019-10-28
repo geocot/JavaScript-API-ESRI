@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Géotraitements</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.13/esri/themes/light/main.css"/>
+    <script src="https://js.arcgis.com/4.13/"></script>
+
+    <style>
+        html, body,#maCarte{
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #outils {
+            background-color:rgb(14, 144, 177);
+            color: white;
+            padding: 10px;
+            font-size:20px;
+            justify-content: center;
+            width: 400px;
+        }
+
+        #indications{
+          font-size:12px;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+    var map;
+
+    require([
+        "esri/Map",  
+        "esri/views/MapView",
+        "esri/tasks/Geoprocessor",
+        "esri/layers/GraphicsLayer", 
+        "esri/Graphic",
+        "esri/tasks/support/FeatureSet",
+        "esri/geometry/Point",
+        "esri/geometry/Polyline",
+        "esri/config",
+        "esri/core/urlUtils",
+        "dojo/domReady!"
+        ], function(Map,
+        MapView,
+        Geoprocessor,
+        GraphicsLayer,
+        Graphic,
+        FeatureSet,
+        Point,
+        Polyline,
+        esriConfig, 
+        urlUtils){
+       
+        urlUtils.addProxyRule({
+        urlPrefix: "sampleserver1.arcgisonline.com",
+        proxyUrl: "https://localhost:444/PHP/proxy.php"
+        });
+        const elementJour = document.getElementById("inputJour");
+
+        const map = new Map({
+          basemap: "gray"
+        });
+
+        const view = new MapView({
+          container: "maCarte",
+          center: [-71.2,46.8],
+          zoom: 10,
+          map: map
+        });
+
+        //Au chargement de la vue.
+        view.when(function(){
+          view.ui.add("outils", "top-right");
+        });
+
+        const gpURL = "https://sampleserver5.arcgisonline.com/arcgis/rest/services/Elevation/ESRI_Elevation_World/GPServer/Viewshed";
+
+        var coucheGraphique = new GraphicsLayer();
+        map.add(coucheGraphique);
+
+        var markerSymbol = {
+          type: "simple-marker",
+          color:[14, 144, 177, 0.8],
+          size:"8px"          
+          }
+
+          var polygonSymbol = {
+          type: "simple-fill", // autocasts as new SimpleFillSymbol()
+          color: [14, 144, 177, 0.8],
+          outline: {
+            // autocasts as new SimpleLineSymbol()
+            color: [255, 255, 255],
+            width: 1
+          }
+        };
+
+        const gp = new Geoprocessor(gpURL);
+        view.on("click", calcBouteille);
+
+    //Évènement du click
+        function calcBouteille(event) {
+          coucheGraphique.removeAll(); //Efface tout
+          
+
+          var pointGraph = new Graphic({
+            geometry: event.mapPoint,
+            symbol: markerSymbol
+          })
+
+          coucheGraphique.add(pointGraph);
+
+          var featureSet = FeatureSet();
+          featureSet.features = pointGraph;
+
+          var parametres = {
+            Input_Observation_Point: featureSet
+            
+          };
+
+          gp.execute(parametres).then(traiteResultats, erreur);
+        };
+
+        function erreur(error){
+            console.log(error.message);
+        }
+
+      function traiteResultats(result){
+
+        var resultats = result.results[0].value.features;
+        console.log("Début");
+        // Assign each resulting graphic a symbol
+        var viewshedGraphics = resultats.map(function(feature) {
+            feature.symbol = polygonSymbol;
+            return feature;
+          });
+
+          coucheGraphique.addMany(viewshedGraphics);
+          console.log("Terminé");
+      };
+    });//Require
+    
+
+    
+    </script>
+    <div id="maCarte">
+      <div class="esri-widget" id="outils">
+          <p>Cette application Web permet d'afficher ce qu'un observateur peut voir à un point donnée</p>
+          <p id="indications">Cliquer sur la carte</p>
+        <!--<input type="number" id="inputJour" min="10" max="400" value="200"/>-->
+      </div>   
+    </div>
+
+</body>
+</html>

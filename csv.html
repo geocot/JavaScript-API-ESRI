@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Introduction à l'API Esri</title>
-    <link rel="stylesheet" href="https://js.arcgis.com/3.29/esri/css/esri.css">
-    <script src="https://js.arcgis.com/3.29/"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.13/esri/themes/light/main.css"/>
+    <script src="https://js.arcgis.com/4.13/"></script>
     <style>
         html, body,#maCarte{
             height: 100%;
@@ -20,19 +20,35 @@
     <script>
     var map;
 
-    require(["dojo/on","esri/map", "esri/geometry/Point", "dojo/domReady!"], function(on, Map, Point){
-        map = new Map("maCarte", 
-        {
-            basemap:"topo", 
-            center: [-71,46],
-            zoom: 5
-        });
-       
-       map.on('click', function(e){
-            alert(e.mapPoint.getLatitude());
-       });
+    require([
+        "esri/Map",
+        "esri/layers/CSVLayer",
+        "esri/views/MapView"
+      ], function(Map, CSVLayer, MapView) {
         
-    });
+        //URL du CSV
+        const url = "http://localhost:81/GeoCSV"
+        
+        //Création de l'instance
+        var csvLayer = new CSVLayer({
+          url: url,
+        });
+
+        //Instance de carte
+        var map = new Map({
+          basemap: "gray",
+          layers: [csvLayer]
+        });
+
+        //Instance du viewer 2D
+        var view = new MapView({
+          container: "maCarte",
+          center: [-71,46],
+          zoom: 5,
+          map: map
+        });
+        
+    }); //Require
     
     
     </script>
