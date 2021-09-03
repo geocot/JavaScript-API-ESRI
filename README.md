@@ -1,2 +1,2 @@
 # JavaScript API ESRI
- Démonstration API JavaScript d'Esri
+ Démonstrations API JavaScript d'Esri
